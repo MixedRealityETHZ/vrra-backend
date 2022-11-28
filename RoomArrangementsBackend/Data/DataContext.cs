@@ -3,9 +3,9 @@ using RoomArrangementsBackend.Models;
 
 namespace RoomArrangementsBackend.Data
 {
-    public class RoomContext : DbContext
+    public class DataContext : DbContext
     {
-        public RoomContext(DbContextOptions<RoomContext> options)
+        public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
         }

@@ -1,16 +1,33 @@
-﻿namespace RoomArrangementsBackend.Models
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace RoomArrangementsBackend.Models
 {
-    public struct Vector3 { public float X, Y, Z; }
+    [Owned]
+    public class Vector3
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+    }
 
-    public struct Quaternion { public float a, b, c, d; }
+    [Owned]
+    public class Quaternion
+    {
+        public float A { get; set; }
+        public float B { get; set; }
+        public float C { get; set; }
+        public float D { get; set; }
+    }
 
+    [Table("Object")]
     public class Obj
     {
         public int Id { get; private set; }
 
-        public Vector3 Translation { get; set; }
+        public Vector3 Translation { get; set; } = new();
 
-        public Quaternion Quaternion { get; set; }
+        public Quaternion Rotation { get; set; } = new();
 
         public Model Model { get; set; } = null!;
 
