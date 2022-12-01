@@ -10,13 +10,13 @@ namespace RoomArrangementsBackend.Controllers;
 [Route("[controller]")]
 public class QueueController : ControllerBase
 {
-    private readonly ILogger<RoomsController> _logger;
+    private readonly ILogger<QueueController> _logger;
     private readonly DataContext _context;
     private readonly MinioClient _minio;
     private IConfigurationSection _minioConfig;
 
 
-    public QueueController(ILogger<RoomsController> logger, DataContext context, MinioClient minio,
+    public QueueController(ILogger<QueueController> logger, DataContext context, MinioClient minio,
         IConfiguration config)
     {
         _logger = logger;
