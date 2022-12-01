@@ -28,12 +28,14 @@ public class ModelsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddModel([FromBody] AddModelBody body)
     {
-        var asset = await _context.Assets.FindAsync(body.AssetId);
+        var asset = await _context.Assets.FirstOrDefaultAsync(
+            a => a.Id == body.AssetId && a.Status == AssetStatus.Ready
+        );
         if (asset == null)
         {
             return BadRequest();
         }
-        
+
         var model = new Model()
         {
             AssetId = body.AssetId,
@@ -58,7 +60,7 @@ public class ModelsController : ControllerBase
 
         return Ok(new ModelDto(model));
     }
-    
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteModel(int id)
     {

@@ -41,6 +41,21 @@ public class AssetsController : ControllerBase
 
         return CreatedAtAction(nameof(GetAsset), new { id = asset.Id }, new { UploadUrl = url });
     }
+    
+    [HttpPost("{id}/uploaded")]
+    public async Task<IActionResult> SetAssetUpdated(int id)
+    {
+        var asset = await _context.Assets.FindAsync(id);
+        
+        if(asset.Status != AssetStatus.Uploading)
+        {
+            return BadRequest();
+        }
+        asset.Status = AssetStatus.Ready;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAsset(int id)

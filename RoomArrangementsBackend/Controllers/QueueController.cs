@@ -26,32 +26,22 @@ public class QueueController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] QueueItemPostBody body)
+    public async Task<IActionResult> Push([FromBody] PushQueueBody body)
     {
-        var asset = new Asset();
-        await _context.Assets.AddAsync(asset);
-        await _context.SaveChangesAsync();
-
-        var args = new PresignedPutObjectArgs()
-            .WithBucket(_minioConfig["Bucket"])
-            .WithExpiry(_minioConfig.GetValue<int>("PutUrlExpiry"))
-            .WithObject(asset.Id.ToString());
-
-        var url = await _minio.PresignedPutObjectAsync(args);
         var item = new QueueItem()
         {
-            Asset = asset,
+            AssetId = body.AssetId,
             Name = body.Name,
         };
         await _context.Queue.AddAsync(item);
 
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetById), new { id = item.Id }, new { UploadUrl = url });
+        return CreatedAtAction(nameof(GetQueueItem), new { id = item.Id });
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetQueueItem(int id)
     {
         var item = await _context.Queue.FindAsync(id);
         if (item == null)
@@ -59,26 +49,7 @@ public class QueueController : ControllerBase
             return NotFound();
         }
 
-        return Ok(item.ToDto());
-    }
-
-    [HttpPost("{id}/uploaded")]
-    public async Task<IActionResult> SetUpdated(int id)
-    {
-        var item = await _context.Queue.Include(item => item.Asset).FirstOrDefaultAsync(item => item.Id == id);
-        if (item == null)
-        {
-            return NotFound();
-        }
-        
-        if(item.Asset.Status != AssetStatus.Uploading)
-        {
-            return BadRequest();
-        }
-        item.Asset.Status = AssetStatus.Ready;
-        await _context.SaveChangesAsync();
-
-        return Ok(item.ToDto());
+        return Ok(new QueueItemDto(item));
     }
 
     [HttpGet("pop")]
@@ -103,16 +74,11 @@ public class QueueController : ControllerBase
             await _context.SaveChangesAsync();
             await trans.CommitAsync();
         }
-        var args = new PresignedGetObjectArgs()
-            .WithBucket(_minioConfig["Bucket"])
-            .WithExpiry(_minioConfig.GetValue<int>("GetUrlExpiry"))
-            .WithObject(item.Asset.Id.ToString());
-        var url = await _minio.PresignedGetObjectAsync(args);
-        return Ok(new { DownloadUrl = url, Item = item.ToDto() });
+        return Ok(new QueueItemDto(item));
     }
     
     [HttpPost("{id}/completed")]
-    public async Task<IActionResult> SetCompleted(int id, [FromBody] QueueItemCompleteBody body)
+    public async Task<IActionResult> SetCompleted(int id, [FromBody] CompleteQueueItemBody body)
     {
         var item = await _context.Queue.Include(item => item.Asset).FirstOrDefaultAsync(item => item.Id == id);
         if (item == null)
@@ -131,11 +97,11 @@ public class QueueController : ControllerBase
         
         await _context.SaveChangesAsync();
 
-        return Ok(item.ToDto());
+        return NoContent();
     }
     
     [HttpPost("{id}/failed")]
-    public async Task<IActionResult> SetFailed(int id, [FromBody] QueueItemCompleteBody body)
+    public async Task<IActionResult> SetFailed(int id, [FromBody] CompleteQueueItemBody body)
     {
         var item = await _context.Queue.Include(item => item.Asset).FirstOrDefaultAsync(item => item.Id == id);
         if (item == null)
@@ -154,6 +120,6 @@ public class QueueController : ControllerBase
         
         await _context.SaveChangesAsync();
 
-        return Ok(item.ToDto());
+        return NoContent();
     }
 }

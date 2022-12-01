@@ -16,18 +16,30 @@ public class QueueItemDto
     public int Id { get; set; }
 
     public string Name { get; set; } = "";
-    
+
     public QueueItemStatus Status { get; set; }
-    
+
     public DateTime Created { get; set; } = DateTime.UtcNow;
-    
+
     public DateTime? Completed { get; set; }
-    
+
     public DateTime? Started { get; set; }
-    
+
     public string Message { get; set; }
-    
+
     public int AssetId { get; set; }
+
+    public QueueItemDto(QueueItem item)
+    {
+        Id = item.Id;
+        Name = item.Name;
+        Status = item.Status;
+        Created = item.Created;
+        Started = item.Started;
+        Completed = item.Completed;
+        AssetId = item.AssetId;
+        Message = item.Message;
+    }
 }
 
 public class QueueItem
@@ -41,36 +53,23 @@ public class QueueItem
     public DateTime Created { get; set; } = DateTime.UtcNow;
 
     public DateTime? Started { get; set; }
-    
+
     public DateTime? Completed { get; set; }
-    
+
     public string Message { get; set; } = "";
 
     public int AssetId { get; set; }
     public Asset Asset { get; set; } = null!;
-    
-    public QueueItemDto ToDto()
-    {
-        return new QueueItemDto
-        {
-            Id = Id,
-            Name = Name,
-            Status = Status,
-            Created = Created,
-            Started = Started,
-            Completed = Completed,
-            AssetId = AssetId,
-            Message = Message
-        };
-    }
 }
 
-public class QueueItemPostBody
+public class PushQueueBody
 {
     public string Name { get; set; } = "";
+
+    public int AssetId { get; set; }
 }
 
-public class QueueItemCompleteBody
+public class CompleteQueueItemBody
 {
     public string Message { get; set; } = "";
 }
