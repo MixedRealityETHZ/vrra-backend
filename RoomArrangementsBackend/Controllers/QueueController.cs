@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Minio;
 using RoomArrangementsBackend.Data;
 using RoomArrangementsBackend.Models;
 
@@ -12,22 +11,25 @@ public class QueueController : ControllerBase
 {
     private readonly ILogger<QueueController> _logger;
     private readonly DataContext _context;
-    private readonly MinioClient _minio;
-    private IConfigurationSection _minioConfig;
 
 
-    public QueueController(ILogger<QueueController> logger, DataContext context, MinioClient minio,
-        IConfiguration config)
+    public QueueController(ILogger<QueueController> logger, DataContext context)
     {
         _logger = logger;
         _context = context;
-        _minio = minio;
-        _minioConfig = config.GetSection("Minio");
     }
 
     [HttpPost]
     public async Task<IActionResult> Push([FromBody] PushQueueBody body)
     {
+        var asset = await _context.Assets.FirstOrDefaultAsync(
+            a => a.Id == body.AssetId && a.Status == AssetStatus.Ready
+        );
+        if (asset == null)
+        {
+            return BadRequest();
+        }
+
         var item = new QueueItem()
         {
             AssetId = body.AssetId,
@@ -37,7 +39,7 @@ public class QueueController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetQueueItem), new { id = item.Id });
+        return CreatedAtAction(nameof(GetQueueItem), new { id = item.Id }, new QueueItemDto(item));
     }
 
     [HttpGet("{id}")]
@@ -70,13 +72,14 @@ public class QueueController : ControllerBase
 
             item.Status = QueueItemStatus.InProgress;
             item.Started = DateTime.UtcNow;
-            
+
             await _context.SaveChangesAsync();
             await trans.CommitAsync();
         }
+
         return Ok(new QueueItemDto(item));
     }
-    
+
     [HttpPost("{id}/completed")]
     public async Task<IActionResult> SetCompleted(int id, [FromBody] CompleteQueueItemBody body)
     {
@@ -85,21 +88,21 @@ public class QueueController : ControllerBase
         {
             return NotFound();
         }
-        
-        if(item.Status != QueueItemStatus.InProgress)
+
+        if (item.Status != QueueItemStatus.InProgress)
         {
             return BadRequest();
         }
-        
+
         item.Status = QueueItemStatus.Completed;
         item.Completed = DateTime.UtcNow;
         item.Message = body.Message;
-        
+
         await _context.SaveChangesAsync();
 
         return NoContent();
     }
-    
+
     [HttpPost("{id}/failed")]
     public async Task<IActionResult> SetFailed(int id, [FromBody] CompleteQueueItemBody body)
     {
@@ -108,16 +111,16 @@ public class QueueController : ControllerBase
         {
             return NotFound();
         }
-        
-        if(item.Status != QueueItemStatus.InProgress)
+
+        if (item.Status != QueueItemStatus.InProgress)
         {
             return BadRequest();
         }
-        
+
         item.Status = QueueItemStatus.Failed;
         item.Completed = DateTime.UtcNow;
         item.Message = body.Message;
-        
+
         await _context.SaveChangesAsync();
 
         return NoContent();

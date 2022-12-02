@@ -46,7 +46,7 @@ public class RoomsController : ControllerBase
         };
         await _context.Rooms.AddAsync(room);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetRoom), new { roomId = room.Id }, new RoomDto(room));
+        return CreatedAtAction(nameof(GetRoom), new { id = room.Id }, new RoomDto(room));
     }
 
     [HttpPost("{id:int}/objects")]
@@ -57,7 +57,7 @@ public class RoomsController : ControllerBase
         {
             return NotFound();
         }
-        
+
         var model = await _context.Models.FirstOrDefaultAsync(x => x.Id == body.ModelId);
         if (model == null)
         {
@@ -70,7 +70,7 @@ public class RoomsController : ControllerBase
             Rotation = body.Rotation,
             Translation = body.Translation,
             Scale = body.Scale,
-            ModelId = body.ModelId
+            Model = model
         };
         await _context.Objects.AddAsync(obj);
         await _context.SaveChangesAsync();
@@ -80,7 +80,8 @@ public class RoomsController : ControllerBase
     [HttpGet("{id:int}/objects")]
     public async Task<IActionResult> GetRoomObjects(int id)
     {
-        var room = await _context.Rooms.Include(x => x.Objects).FirstOrDefaultAsync(x => x.Id == id);
+        var room = await _context.Rooms.Include(x => x.Objects).ThenInclude(o => o.Model)
+            .FirstOrDefaultAsync(x => x.Id == id);
         if (room == null)
         {
             return NotFound();
@@ -92,7 +93,7 @@ public class RoomsController : ControllerBase
     [HttpGet("{roomId:int}/objects/{objId:int}")]
     public async Task<IActionResult> GetRoomObject(int roomId, int objId)
     {
-        var objs = from o in _context.Objects
+        var objs = from o in _context.Objects.Include(o => o.Model)
             where o.Id == objId && o.RoomId == roomId
             select o;
         var obj = await objs.FirstOrDefaultAsync();
@@ -103,7 +104,7 @@ public class RoomsController : ControllerBase
 
         return Ok(new ObjDto(obj));
     }
-    
+
     [HttpDelete("{roomId:int}/objects/{objId:int}")]
     public async Task<IActionResult> RemoveRoomObject(int roomId, int objId)
     {
@@ -118,7 +119,7 @@ public class RoomsController : ControllerBase
 
         _context.Objects.Remove(obj);
         await _context.SaveChangesAsync();
-        
-        return Ok(new ObjDto(obj));
+
+        return NoContent();
     }
 }

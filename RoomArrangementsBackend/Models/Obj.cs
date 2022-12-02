@@ -1,23 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace RoomArrangementsBackend.Models;
-
-[Owned]
-public class Vector3
-{
-    public float X { get; set; }
-    public float Y { get; set; }
-    public float Z { get; set; }
-}
-
-[Owned]
-public class Quaternion
-{
-    public float A { get; set; }
-    public float B { get; set; }
-    public float C { get; set; }
-    public float D { get; set; }
-}
+﻿namespace RoomArrangementsBackend.Models;
 
 public class Obj
 {
@@ -42,7 +23,7 @@ public class ObjDto{
     public Quaternion Rotation { get; set; }
     public Vector3 Scale { get; set; }
     public int RoomId { get; set; }
-    public int ModelId { get; set; }
+    public ModelDto Model { get; set; }
     
     public ObjDto(Obj obj) 
     {
@@ -51,7 +32,7 @@ public class ObjDto{
         Rotation = obj.Rotation;
         Scale = obj.Scale;
         RoomId = obj.RoomId;
-        ModelId = obj.ModelId;
+        Model = new ModelDto(obj.Model);
     }
 }
 

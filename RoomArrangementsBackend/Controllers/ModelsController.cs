@@ -12,17 +12,12 @@ public class ModelsController : ControllerBase
 {
     private readonly ILogger<ModelsController> _logger;
     private readonly DataContext _context;
-    private readonly MinioClient _minio;
-    private IConfigurationSection _minioConfig;
 
 
-    public ModelsController(ILogger<ModelsController> logger, DataContext context, MinioClient minio,
-        IConfiguration config)
+    public ModelsController(ILogger<ModelsController> logger, DataContext context)
     {
         _logger = logger;
         _context = context;
-        _minio = minio;
-        _minioConfig = config.GetSection("Minio");
     }
 
     [HttpPost]
@@ -45,7 +40,7 @@ public class ModelsController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetModel), new { id = model.Id });
+        return CreatedAtAction(nameof(GetModel), new { id = model.Id }, new ModelDto(model));
     }
 
     [HttpGet("{id}")]
