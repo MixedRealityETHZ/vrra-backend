@@ -13,8 +13,8 @@ public class Vector3
 [Owned]
 public class Quaternion
 {
-    public float A { get; set; }
-    public float B { get; set; }
-    public float C { get; set; }
-    public float D { get; set; }
+    public float X { get; set; }
+    public float Y { get; set; }
+    public float Z { get; set; }
+    public float W { get; set; }
 }

@@ -35,6 +35,8 @@ public class ModelsController : ControllerBase
         {
             AssetId = body.AssetId,
             Name = body.Name,
+            Path = body.Path,
+            Bounds = body.Bounds
         };
         await _context.Models.AddAsync(model);
 
