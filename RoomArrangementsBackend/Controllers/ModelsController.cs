@@ -20,6 +20,13 @@ public class ModelsController : ControllerBase
         _context = context;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetModels()
+    {
+        var models = await _context.Models.Select(m => new ModelDto(m)).ToListAsync();
+        return Ok(models);
+    }
+    
     [HttpPost]
     public async Task<IActionResult> AddModel([FromBody] AddModelBody body)
     {
