@@ -29,6 +29,8 @@ public class QueueItemDto
 
     public int AssetId { get; set; }
 
+    public string Path { get; set; }
+
     public QueueItemDto(QueueItem item)
     {
         Id = item.Id;
@@ -39,6 +41,7 @@ public class QueueItemDto
         Completed = item.Completed;
         AssetId = item.AssetId;
         Message = item.Message;
+        Path = item.Path;
     }
 }
 
@@ -60,6 +63,8 @@ public class QueueItem
 
     public int AssetId { get; set; }
     public Asset Asset { get; set; } = null!;
+
+    public string Path { get; set; } = "";
 }
 
 public class PushQueueBody
@@ -67,6 +72,8 @@ public class PushQueueBody
     public string Name { get; set; } = "";
 
     public int AssetId { get; set; }
+
+    public string Path { get; set; } = "";
 }
 
 public class CompleteQueueItemBody

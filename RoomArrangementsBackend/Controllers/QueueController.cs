@@ -34,6 +34,7 @@ public class QueueController : ControllerBase
         {
             AssetId = body.AssetId,
             Name = body.Name,
+            Path = body.Path,
         };
         await _context.Queue.AddAsync(item);
 

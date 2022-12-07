@@ -26,26 +26,33 @@ public class AssetsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddAsset()
+    public async Task<IActionResult> AddAsset([FromBody] AddAssetBody body)
     {
-        var asset = new Asset();
+        var asset = new Asset(){
+            Name = body.Name,
+            Status = AssetStatus.Uploading,
+        };
         await _context.Assets.AddAsync(asset);
         await _context.SaveChangesAsync();
 
         var args = new PresignedPutObjectArgs()
             .WithBucket(_minioConfig["Bucket"])
             .WithExpiry(_minioConfig.GetValue<int>("PutUrlExpiry"))
-            .WithObject(asset.Id.ToString());
+            .WithObject($"{asset.Id}-{asset.Name}");
 
         var url = await _minio.PresignedPutObjectAsync(args);
 
-        return CreatedAtAction(nameof(GetAsset), new { id = asset.Id }, new { UploadUrl = url });
+        return CreatedAtAction(nameof(GetAsset), new { id = asset.Id }, new AssetDto(asset, url));
     }
     
     [HttpPost("{id}/uploaded")]
     public async Task<IActionResult> SetAssetUpdated(int id)
     {
         var asset = await _context.Assets.FindAsync(id);
+        if (asset == null)
+        {
+            return NotFound();
+        }
         
         if(asset.Status != AssetStatus.Uploading)
         {
@@ -72,7 +79,7 @@ public class AssetsController : ControllerBase
             var args = new PresignedGetObjectArgs()
                 .WithBucket(_minioConfig["Bucket"])
                 .WithExpiry(_minioConfig.GetValue<int>("GetUrlExpiry"))
-                .WithObject(asset.Id.ToString());
+                .WithObject($"{asset.Id}-{asset.Name}");
 
             url = await _minio.PresignedGetObjectAsync(args);
         }
