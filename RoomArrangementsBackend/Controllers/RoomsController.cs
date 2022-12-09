@@ -40,9 +40,21 @@ public class RoomsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddRoom([FromBody] RoomPostBody body)
     {
+        Asset? thumbnail = null;
+        if (body.ThumbnailAssetId != null)
+        {
+            thumbnail = await _context.Assets.FirstOrDefaultAsync(x =>
+                x.Id == body.ThumbnailAssetId && x.Status == AssetStatus.Ready);
+            if (thumbnail == null)
+            {
+                return BadRequest("Thumbnail not found or not ready");
+            }
+        }
+
         var room = new Room
         {
-            Name = body.Name
+            Name = body.Name,
+            ThumbnailAsset = thumbnail
         };
         await _context.Rooms.AddAsync(room);
         await _context.SaveChangesAsync();
