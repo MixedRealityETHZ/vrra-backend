@@ -37,13 +37,26 @@ public class ModelsController : ControllerBase
         {
             return BadRequest();
         }
+        
+        Asset? thumbnail = null;
+        if (body.ThumbnailAssetId != null)
+        {
+            thumbnail = await _context.Assets.FirstOrDefaultAsync(
+                a => a.Id == body.ThumbnailAssetId && a.Status == AssetStatus.Ready
+            );
+            if (thumbnail == null)
+            {
+                return BadRequest();
+            }
+        }
 
         var model = new Model()
         {
-            AssetId = body.AssetId,
+            Asset = asset,
             Name = body.Name,
             Path = body.Path,
-            Bounds = body.Bounds
+            Bounds = body.Bounds,
+            ThumbnailAsset = thumbnail
         };
         await _context.Models.AddAsync(model);
 
