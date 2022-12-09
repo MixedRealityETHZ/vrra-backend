@@ -69,6 +69,7 @@ public class RoomsController : ControllerBase
             RoomId = room.Id,
             Rotation = body.Rotation,
             Translation = body.Translation,
+            Movable = body.Movable,
             Scale = body.Scale,
             Model = model
         };
