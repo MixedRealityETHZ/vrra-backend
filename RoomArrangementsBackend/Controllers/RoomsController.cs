@@ -135,4 +135,36 @@ public class RoomsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{roomId:int}/objects/{objId:int}")]
+    public async Task<IActionResult> UpdateRoomObject(int roomId, int objId, [FromBody] AddRoomObjBody body)
+    {
+        var room = await _context.Rooms.Include(x => x.Objects).FirstOrDefaultAsync(x => x.Id == roomId);
+        if (room == null)
+        {
+            return NotFound();
+        }
+
+        var obj = room.Objects.FirstOrDefault(x => x.Id == objId);
+        if (obj == null)
+        {
+            return NotFound();
+        }
+
+        var model = await _context.Models.FirstOrDefaultAsync(x => x.Id == body.ModelId);
+        if (model == null)
+        {
+            return BadRequest();
+        }
+
+        obj.RoomId = room.Id;
+        obj.Rotation = body.Rotation;
+        obj.Translation = body.Translation;
+        obj.Movable = body.Movable;
+        obj.Scale = body.Scale;
+        obj.Model = model;
+        
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 }
