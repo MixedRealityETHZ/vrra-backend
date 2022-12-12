@@ -55,6 +55,14 @@ public class QueueController : ControllerBase
         return Ok(new QueueItemDto(item));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetQueue()
+    {
+        var items = await _context.Queue.ToListAsync();
+        return Ok(items.Select(i => new QueueItemDto(i)));
+    }
+
+
     [HttpGet("pop")]
     public async Task<IActionResult> Pop()
     {
