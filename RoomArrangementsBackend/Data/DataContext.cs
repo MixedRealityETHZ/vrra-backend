@@ -15,9 +15,9 @@ namespace RoomArrangementsBackend.Data
         public DbSet<Obj> Objects { get; set; }
 
         public DbSet<Model> Models { get; set; }
-        
+
         public DbSet<Asset> Assets { get; set; }
-        
+
         public DbSet<QueueItem> Queue { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

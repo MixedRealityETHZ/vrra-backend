@@ -10,11 +10,11 @@ public class Model
 
     public string Path { get; set; }
 
-    public Vector3? Bounds { get; set; }
+    public Bounds3 Bounds { get; set; } = new();
 
     public int AssetId { get; set; }
     public Asset Asset { get; set; }
-    
+
     public int? ThumbnailAssetId { get; set; }
     public Asset? ThumbnailAsset { get; set; }
 }
@@ -27,10 +27,10 @@ public class ModelDto
 
     public string Path { get; set; }
 
-    public Vector3? Bounds { get; set; }
+    public Bounds3 Bounds { get; set; }
 
     public int AssetId { get; set; }
-    
+
     public int? ThumbnailAssetId { get; set; }
 
     public ModelDto(Model model)
@@ -52,7 +52,7 @@ public class AddModelBody
 
     public string Path { get; set; }
 
-    public Vector3? Bounds { get; set; }
-    
+    public Bounds3? Bounds { get; set; }
+
     public int? ThumbnailAssetId { get; set; }
 }

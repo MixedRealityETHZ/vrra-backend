@@ -26,7 +26,7 @@ public class ModelsController : ControllerBase
         var models = await _context.Models.Select(m => new ModelDto(m)).ToListAsync();
         return Ok(models);
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> AddModel([FromBody] AddModelBody body)
     {
@@ -37,7 +37,7 @@ public class ModelsController : ControllerBase
         {
             return BadRequest();
         }
-        
+
         Asset? thumbnail = null;
         if (body.ThumbnailAssetId != null)
         {
@@ -55,9 +55,10 @@ public class ModelsController : ControllerBase
             Asset = asset,
             Name = body.Name,
             Path = body.Path,
-            Bounds = body.Bounds,
             ThumbnailAsset = thumbnail
         };
+        if (body.Bounds != null) model.Bounds = body.Bounds;
+        
         await _context.Models.AddAsync(model);
 
         await _context.SaveChangesAsync();

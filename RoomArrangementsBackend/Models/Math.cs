@@ -18,3 +18,10 @@ public class Quaternion
     public float Z { get; set; }
     public float W { get; set; }
 }
+
+[Owned]
+public class Bounds3
+{
+    public Vector3 PMin { get; set; } = new() { X = 0, Y = 0, Z = 0 };
+    public Vector3 PMax { get; set; } = new() { X = 0, Y = 0, Z = 0 };
+}
