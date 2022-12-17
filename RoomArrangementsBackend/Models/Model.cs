@@ -1,6 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Text.Json.Serialization;
 
 namespace RoomArrangementsBackend.Models;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ModelFormat
+{
+    Obj,
+    UnityAssetBundle,
+}
 
 public class Model
 {
@@ -11,6 +18,8 @@ public class Model
     public string Path { get; set; }
 
     public Bounds3 Bounds { get; set; } = new();
+
+    public ModelFormat Format { get; set; } = ModelFormat.Obj;
 
     public int AssetId { get; set; }
     public Asset Asset { get; set; }
@@ -29,6 +38,8 @@ public class ModelDto
 
     public Bounds3 Bounds { get; set; }
 
+    public ModelFormat Format { get; set; }
+
     public int AssetId { get; set; }
 
     public int? ThumbnailAssetId { get; set; }
@@ -40,6 +51,7 @@ public class ModelDto
         AssetId = model.AssetId;
         Path = model.Path;
         Bounds = model.Bounds;
+        Format = model.Format;
         ThumbnailAssetId = model.ThumbnailAssetId;
     }
 }
@@ -53,6 +65,8 @@ public class AddModelBody
     public string Path { get; set; }
 
     public Bounds3? Bounds { get; set; }
+
+    public ModelFormat? Format { get; set; }
 
     public int? ThumbnailAssetId { get; set; }
 }

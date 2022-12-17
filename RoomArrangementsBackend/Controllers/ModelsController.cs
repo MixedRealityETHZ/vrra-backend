@@ -58,6 +58,7 @@ public class ModelsController : ControllerBase
             ThumbnailAsset = thumbnail
         };
         if (body.Bounds != null) model.Bounds = body.Bounds;
+        if (body.Format.HasValue) model.Format = body.Format.Value;
         
         await _context.Models.AddAsync(model);
 
