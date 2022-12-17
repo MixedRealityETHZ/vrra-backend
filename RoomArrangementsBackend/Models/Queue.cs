@@ -29,6 +29,8 @@ public class QueueItemDto
 
     public int AssetId { get; set; }
 
+    public int PointCloudAssetId { get; set; }
+
     public string Path { get; set; }
 
     public QueueItemDto(QueueItem item)
@@ -40,6 +42,7 @@ public class QueueItemDto
         Started = item.Started;
         Completed = item.Completed;
         AssetId = item.AssetId;
+        PointCloudAssetId = item.PointCloudAssetId;
         Message = item.Message;
         Path = item.Path;
     }
@@ -64,6 +67,9 @@ public class QueueItem
     public int AssetId { get; set; }
     public Asset Asset { get; set; } = null!;
 
+    public int PointCloudAssetId { get; set; }
+    public Asset PointCloudAsset { get; set; } = null!;
+
     public string Path { get; set; } = "";
 }
 
@@ -72,6 +78,8 @@ public class PushQueueBody
     public string Name { get; set; } = "";
 
     public int AssetId { get; set; }
+
+    public int PointCloudAssetId { get; set; }
 
     public string Path { get; set; } = "";
 }

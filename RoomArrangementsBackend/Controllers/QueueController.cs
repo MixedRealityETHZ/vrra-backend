@@ -33,6 +33,7 @@ public class QueueController : ControllerBase
         var item = new QueueItem()
         {
             AssetId = body.AssetId,
+            PointCloudAssetId = body.PointCloudAssetId,
             Name = body.Name,
             Path = body.Path,
         };
